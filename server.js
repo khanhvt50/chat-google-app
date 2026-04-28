@@ -72,11 +72,9 @@ io.use((socket, next) => {
 io.on("connection", (socket) => {
   const user = socket.request.session.passport?.user;
 
-  if (!user) return;
-
   socket.on("send_message", (msg) => {
     io.emit("receive_message", {
-      user: user.displayName,
+      user: user?.displayName || "User",
       text: msg
     });
   });
