@@ -1,49 +1,101 @@
 <!DOCTYPE html>
-<html>
+<html lang="vi">
 <head>
-  <title>Chat</title>
+  <meta charset="UTF-8">
+  <title>AI Chat</title>
   <script src="/socket.io/socket.io.js"></script>
+
   <style>
     body {
-      margin:0;
-      font-family:Arial;
-      background:#0f172a;
-      color:white;
-      display:flex;
-      flex-direction:column;
-      height:100vh;
+      margin: 0;
+      font-family: "Segoe UI", Arial;
+      background: #0f172a;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
     }
 
+    /* HEADER */
+    header {
+      padding: 15px 20px;
+      background: #1e293b;
+      font-weight: bold;
+      border-bottom: 1px solid #334155;
+    }
+
+    /* CHAT AREA */
     #chat {
-      flex:1;
-      overflow-y:auto;
-      padding:20px;
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
     }
 
-    .msg {
-      margin:10px 0;
+    .message {
+      max-width: 70%;
+      padding: 12px 15px;
+      border-radius: 12px;
+      line-height: 1.4;
+      word-wrap: break-word;
     }
 
+    .user {
+      align-self: flex-end;
+      background: #2563eb;
+    }
+
+    .other {
+      align-self: flex-start;
+      background: #1e293b;
+    }
+
+    .username {
+      font-size: 12px;
+      opacity: 0.7;
+      margin-bottom: 3px;
+    }
+
+    /* INPUT */
     #inputBox {
-      display:flex;
-      padding:10px;
-      background:#1e293b;
+      display: flex;
+      padding: 15px;
+      background: #1e293b;
+      border-top: 1px solid #334155;
     }
 
     input {
-      flex:1;
-      padding:10px;
-      border-radius:6px;
-      border:none;
+      flex: 1;
+      padding: 12px;
+      border-radius: 10px;
+      border: none;
+      outline: none;
+      background: #0f172a;
+      color: white;
     }
 
     button {
-      margin-left:10px;
-      padding:10px;
+      margin-left: 10px;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 10px;
+      background: #2563eb;
+      color: white;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    button:hover {
+      background: #1d4ed8;
     }
   </style>
 </head>
+
 <body>
+
+<header>💬 AI Chat</header>
 
 <div id="chat"></div>
 
@@ -55,23 +107,36 @@
 <script>
 const socket = io();
 
+// gửi tin
 function send() {
   const input = document.getElementById("msg");
-  const text = input.value;
+  const text = input.value.trim();
   if (!text) return;
 
   socket.emit("send_message", text);
   input.value = "";
 }
 
+// nhận tin
 socket.on("receive_message", (data) => {
+  addMessage(data.user, data.text);
+});
+
+// hiển thị
+function addMessage(user, text) {
   const chat = document.getElementById("chat");
+
   const div = document.createElement("div");
-  div.className = "msg";
-  div.innerText = data.user + ": " + data.text;
+  div.className = "message " + (user === "You" ? "user" : "other");
+
+  div.innerHTML = `
+    <div class="username">${user}</div>
+    <div>${text}</div>
+  `;
+
   chat.appendChild(div);
   chat.scrollTop = chat.scrollHeight;
-});
+}
 </script>
 
 </body>
